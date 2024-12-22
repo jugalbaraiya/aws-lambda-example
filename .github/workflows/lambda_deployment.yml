@@ -77,12 +77,12 @@ jobs:
   build:
     #Depends on sonar's job
 #    needs: sonar
-    name: Build
+    name: Build & Deploy
     #Run on Ubuntu using the latest version
     runs-on: ubuntu-latest
     steps:
       #Check-out your repository under $GITHUB_WORKSPACE, so your workflow can access it
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       #Set up JDK 11
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -99,15 +99,22 @@ jobs:
       #Build the application using Maven
       - name: Build with Maven
         run: mvn -B package -DskipTests --file pom.xml
-      #Build the application using Maven
-      - name: Upload JAR
-        #This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
-        uses: actions/upload-artifact@v2
+#      #Install zip tool
+#      - name: Install zip tool
+#        uses: montudor/action-zip@v1
+#      #Install zip tool
+#      - name: Create Zip file for Lambda function
+#        run: zip -r code.zip .
+      - name: AWS CLI v2
+        uses: imehedi/actions-awscli-v2@latest
         with:
-          #Set artifact name
-          name: artifact
-          #From this path
-          path: target/aws-lambda-example-1.0-SNAPSHOT-lambda-package.zip
+          args: "lambda update-function-code \
+            --function-name arn:aws:lambda:ap-south-1:160885260142:function:aws-lambda-example \
+            --zip-file fileb://code.zip"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "ap-south-1"
 
 
 
