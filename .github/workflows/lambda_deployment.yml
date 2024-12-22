@@ -100,7 +100,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B package -DskipTests --file pom.xml
       #Install AWS CLI v2
-      - name: AWS CLI v2
+      - name: AWS CLI v2 to Deploy Zip
         uses: imehedi/actions-awscli-v2@latest
         with:
           args: "lambda update-function-code \
@@ -110,53 +110,3 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: "ap-south-1"
-
-
-
-
-  #Deploy's job
-#  deploy:
-#    #Depends on build's job
-#    needs: build
-#    name: Deploy
-#    #Run on Ubuntu using the latest version
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Download JAR
-#        #Download the artifact which was uploaded in the build's job
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: artifact
-#      #Deploy the artifact (JAR) into AWS Beanstalk
-#      - name: Deploy to EB
-#        uses: einaregilsson/beanstalk-deploy@v13
-#        with:
-#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
-#          use_existing_version_if_available: false
-#          application_name: spring-boot-deploy
-#          environment_name: Springbootdeploy-env
-#          version_label: ${{github.SHA}}
-#          region: us-east-1
-#          deployment_package: data-0.0.1-SNAPSHOT.jar
-
-#  deploy:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Install zip tool
-#        uses: montudor/action-zip@v1
-#      - name: Create Zip file for Lambda function
-#        run: zip -r code.zip .
-#      - name: AWS CLI v2
-#        uses: imehedi/actions-awscli-v2@latest
-#        with:
-#          args: "lambda update-function-code \
-#            --function-name arn:aws:lambda:ap-south-1:160885260142:function:aws-lambda-example \
-#            --zip-file fileb://code.zip"
-#        env:
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          AWS_DEFAULT_REGION: "ap-south-1"
